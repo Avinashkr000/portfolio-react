@@ -5,6 +5,118 @@ import { Points, PointMaterial, Sphere, MeshDistortMaterial } from "@react-three
 import "./App.css";
 
 /***********************
+ * Theme System
+ ***********************/
+const THEME_KEY = "ak_portfolio_theme";
+
+function useTheme() {
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem(THEME_KEY);
+    return saved || "dark";
+  });
+  
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
+  
+  const toggle = () => setTheme(prev => prev === "dark" ? "light" : "dark");
+  return { theme, toggle };
+}
+
+function ThemeToggle({ onClick, theme }) {
+  return (
+    <motion.button
+      className="nav-theme-toggle magnetic"
+      onClick={onClick}
+      whileHover={{ scale: 1.1, rotate: 180 }}
+      whileTap={{ scale: 0.9 }}
+      title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      aria-label="Toggle theme"
+    >
+      {theme === "dark" ? "☀️" : "🌙"}
+    </motion.button>
+  );
+}
+
+/***********************
+ * Multi-Language Splash Screen
+ ***********************/
+const welcomeMessages = [
+  "Welcome", "Namaste", "नमस्ते", "Bonjour", "Hola", "Hallo", "Ciao", "Olá", "Привет", 
+  "مرحبا", "שלום", "नमस्कार", "ਸਤ ਸ੍ਰੀ ਅਕਾਲ", "வணக்கம்", "നമസ്തേ", "నమస్తే", "ನಮಸ್ಕಾರ", 
+  "ජය වේවා", "สวัสดี", "Xin chào", "こんにちは", "안녕하세요", "你好", "Selamat datang", 
+  "Kia ora", "Salaam", "Merhaba", "Hej", "Hei", "Ahoj", "Sveiki", "Tere", "Moien", 
+  "Bună", "Sawasdee", "Habari", "Halo", "Guten Tag", "Shalom", "Asalaam Alaikum", 
+  "Szia", "Yassas", "Zdravo", "Aloha", "Mabuhay", "Dobrodošli", "Dia duit", "God dag", 
+  "Pozdrav", "Sveiks", "Kamusta", "Kumusta", "Sawubona", "Molo", "Salam", "Jambo"
+];
+
+function SplashScreen({ onComplete }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % welcomeMessages.length);
+    }, 100);
+    
+    const exitTimer = setTimeout(() => {
+      setIsExiting(true);
+      setTimeout(onComplete, 800);
+    }, 4000);
+    
+    return () => {
+      clearInterval(interval);
+      clearTimeout(exitTimer);
+    };
+  }, [onComplete]);
+  
+  return (
+    <AnimatePresence>
+      {!isExiting && (
+        <motion.div
+          className="splash-overlay"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0, scale: 1.1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="splash-content">
+            <motion.div
+              key={currentIndex}
+              className="splash-greeting"
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 1.1 }}
+              transition={{ duration: 0.1 }}
+            >
+              {welcomeMessages[currentIndex]}
+            </motion.div>
+            
+            <motion.div
+              className="splash-identity"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1, duration: 1 }}
+            >
+              <div className="identity-name">Avinash Kumar</div>
+              <div className="identity-role">Java Backend & DevOps Engineer</div>
+            </motion.div>
+            
+            <motion.div
+              className="splash-progress"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 0.5, duration: 3, ease: "easeInOut" }}
+            />
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/***********************
  * Advanced Hooks & Utilities
  ***********************/
 const useTypewriter = (text, speed = 85) => {
@@ -121,7 +233,7 @@ function FloatingGeometry({ position, geometry = "sphere" }) {
   );
 }
 
-function InteractiveStars({ count = 8000 }) {
+function InteractiveStars({ count = 6000 }) {
   const ref = useRef();
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
   
@@ -194,9 +306,9 @@ function Enhanced3DBackground() {
 }
 
 /***********************
- * Advanced Navbar
+ * Advanced Navbar with Theme Toggle
  ***********************/
-function ModernNavbar() {
+function ModernNavbar({ theme, onThemeToggle }) {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
 
@@ -267,13 +379,7 @@ function ModernNavbar() {
         ))}
       </div>
       
-      <motion.div 
-        className="nav-theme-toggle magnetic"
-        whileHover={{ scale: 1.1, rotate: 180 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        🌙
-      </motion.div>
+      <ThemeToggle onClick={onThemeToggle} theme={theme} />
     </motion.nav>
   );
 }
@@ -325,7 +431,7 @@ function EnhancedHero() {
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
   
   const greeting = useTypewriter("नमस्ते! I'm Avinash Kumar", 100);
-  const role = useTypewriter("Full-Stack Java Developer & DevOps Engineer", 60);
+  const role = useTypewriter("Java Backend Developer & DevOps Engineer", 60);
 
   return (
     <motion.section 
@@ -385,9 +491,9 @@ function EnhancedHero() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.7 }}
         >
-          Building scalable microservices, automating CI/CD pipelines, and crafting 
-          seamless user experiences. <span className="highlight">220+ DSA problems</span> solved, 
-          <span className="highlight"> Ex-Capgemini</span> engineer, always learning.
+          Experienced in <span className="highlight">Spring Boot microservices</span>, 
+          <span className="highlight"> AWS deployments</span>, and <span className="highlight">CI/CD automation</span>. 
+          Ex-<span className="highlight">Capgemini intern</span> with expertise in Redis, Docker, Jenkins, and OpenAI API integration.
         </motion.p>
 
         <motion.div
@@ -400,7 +506,7 @@ function EnhancedHero() {
             { label: "Projects", value: "15+" },
             { label: "DSA Solved", value: "220+" },
             { label: "Experience", value: "2+ Years" },
-            { label: "Technologies", value: "12+" }
+            { label: "Technologies", value: "15+" }
           ].map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -474,17 +580,17 @@ function EnhancedAbout() {
     {
       icon: "👨‍💻",
       title: "Backend Specialist", 
-      description: "Expert in Java, Spring Boot, microservices architecture, and RESTful APIs with 2+ years experience"
+      description: "Expert in Java, Spring Boot, microservices architecture, and RESTful APIs. Capgemini internship experience with enterprise-scale applications."
     },
     {
       icon: "☁️",
       title: "DevOps Engineer",
-      description: "Skilled in Docker, AWS, Jenkins, CI/CD pipelines, and infrastructure automation"
+      description: "Proficient in Docker, AWS (EC2, S3), Jenkins CI/CD pipelines, SonarQube, and infrastructure automation with hands-on production experience."
     },
     {
       icon: "🚀", 
       title: "Problem Solver",
-      description: "220+ DSA problems solved, competitive programmer, and continuous learner"
+      description: "220+ DSA problems solved, competitive programmer, and AI integration specialist with OpenAI API and LLM prototype development."
     }
   ];
 
@@ -498,7 +604,7 @@ function EnhancedAbout() {
           viewport={{ once: true }}
         >
           <h2 className="section-title-enhanced">About Me</h2>
-          <div className="section-subtitle">Building the future, one line of code at a time</div>
+          <div className="section-subtitle">Building scalable systems, one microservice at a time</div>
         </motion.div>
 
         <div className="about-grid">
@@ -512,28 +618,29 @@ function EnhancedAbout() {
             <div className="story-card">
               <h3>My Journey</h3>
               <p>
-                Started as a curious B.Tech student, evolved into a passionate <span className="highlight">Backend Engineer</span> at 
-                <span className="highlight"> Capgemini</span>. From building my first "Hello World" to deploying 
-                enterprise microservices on AWS, every challenge has been a learning opportunity.
+                From <span className="highlight">B.Tech CSE (Data Science)</span> at Technocrats Institute to 
+                <span className="highlight"> Capgemini intern</span>, I've evolved from curious student to 
+                production-ready backend engineer. Deployed Spring Boot microservices on AWS, built CI/CD 
+                pipelines with Jenkins, and optimized database queries with Redis caching.
               </p>
               <p>
-                Currently focusing on <span className="highlight">Spring Boot ecosystems</span>, cloud-native architectures, 
-                and exploring the intersection of AI with backend systems. Always excited about new technologies 
-                and solving complex problems.
+                Currently exploring <span className="highlight">AI integration</span> in backend systems, 
+                working with OpenAI APIs, and developing LLM-based prototypes. Passionate about clean 
+                architecture, scalable design patterns, and DevOps automation.
               </p>
               
               <div className="journey-stats">
                 <div className="journey-stat">
-                  <span className="stat-number">2+</span>
-                  <span className="stat-text">Years Experience</span>
+                  <span className="stat-number">CGPA 7.33</span>
+                  <span className="stat-text">Academic Excellence</span>
                 </div>
                 <div className="journey-stat">
-                  <span className="stat-number">15+</span>
-                  <span className="stat-text">Projects Built</span>
+                  <span className="stat-number">Capgemini</span>
+                  <span className="stat-text">Intern Experience</span>
                 </div>
                 <div className="journey-stat">
-                  <span className="stat-number">220+</span>
-                  <span className="stat-text">Problems Solved</span>
+                  <span className="stat-number">Production</span>
+                  <span className="stat-text">Ready Systems</span>
                 </div>
               </div>
             </div>
@@ -578,29 +685,39 @@ function EnhancedSkills() {
       icon: "⚙️",
       skills: [
         { name: "Java", level: 90, icon: "☕" },
-        { name: "Spring Boot", level: 85, icon: "🍃" },
-        { name: "MySQL", level: 82, icon: "🗄️" },
-        { name: "Redis", level: 75, icon: "⚡" },
+        { name: "Spring Boot", level: 88, icon: "🍃" },
+        { name: "Hibernate", level: 82, icon: "🔄" },
+        { name: "JUnit/Mockito", level: 78, icon: "🧪" },
       ]
     },
     {
       title: "DevOps & Cloud",
       icon: "☁️", 
       skills: [
-        { name: "Docker", level: 78, icon: "🐳" },
-        { name: "AWS", level: 72, icon: "📦" },
-        { name: "Jenkins", level: 75, icon: "🔧" },
-        { name: "Git", level: 88, icon: "📚" },
+        { name: "AWS (EC2, S3)", level: 75, icon: "☁️" },
+        { name: "Docker", level: 80, icon: "🐳" },
+        { name: "Jenkins", level: 76, icon: "🔧" },
+        { name: "SonarQube", level: 70, icon: "📊" },
       ]
     },
     {
-      title: "Frontend & Tools",
+      title: "Databases & Tools",
+      icon: "🗄️",
+      skills: [
+        { name: "MySQL", level: 85, icon: "🗄️" },
+        { name: "Redis", level: 78, icon: "⚡" },
+        { name: "Postman", level: 88, icon: "📮" },
+        { name: "Jira", level: 75, icon: "📋" },
+      ]
+    },
+    {
+      title: "Frontend & AI",
       icon: "🎨",
       skills: [
         { name: "React", level: 80, icon: "⚛️" },
         { name: "JavaScript", level: 78, icon: "📜" },
-        { name: "HTML/CSS", level: 85, icon: "🎯" },
-        { name: "Maven", level: 82, icon: "📋" },
+        { name: "OpenAI API", level: 82, icon: "🤖" },
+        { name: "Prompt Engineering", level: 85, icon: "🧠" },
       ]
     }
   ];
@@ -615,7 +732,7 @@ function EnhancedSkills() {
           viewport={{ once: true }}
         >
           <h2 className="section-title-enhanced">Technical Arsenal</h2>
-          <div className="section-subtitle">Tools and technologies I work with daily</div>
+          <div className="section-subtitle">Production-tested technologies and frameworks</div>
         </motion.div>
 
         <div className="skills-categories">
@@ -693,9 +810,9 @@ function EnhancedProjects() {
   const projects = [
     {
       title: "Inventory Management System",
-      description: "Enterprise-grade inventory system with JWT authentication, role-based access control, and real-time updates. Built with Spring Boot and MySQL.",
+      description: "Enterprise-grade inventory system with JWT authentication, role-based access control, and real-time updates. Built with Spring Boot, MySQL, and deployed on AWS.",
       image: "🏪",
-      tech: ["Spring Boot", "JWT", "MySQL", "Swagger", "REST API"],
+      tech: ["Spring Boot", "JWT", "MySQL", "AWS", "Swagger", "Docker"],
       github: "https://github.com/Avinashkr000/InventoryManagementSystem",
       demo: "#",
       featured: true,
@@ -703,9 +820,9 @@ function EnhancedProjects() {
     },
     {
       title: "AI Symptom Checker", 
-      description: "Healthcare AI assistant powered by OpenAI GPT for intelligent symptom analysis and medical guidance recommendations.",
+      description: "Healthcare AI assistant powered by OpenAI GPT for intelligent symptom analysis and medical guidance recommendations with Redis caching.",
       image: "🏥",
-      tech: ["Spring Boot", "OpenAI API", "MySQL", "React"],
+      tech: ["Spring Boot", "OpenAI API", "MySQL", "Redis", "CI/CD"],
       github: "https://github.com/Avinashkr000/health-symptom-checker", 
       demo: "#",
       featured: true,
@@ -713,9 +830,9 @@ function EnhancedProjects() {
     },
     {
       title: "Employee Payroll System",
-      description: "Complete payroll management system with automated salary calculations, tax deductions, and comprehensive reporting dashboard.",
+      description: "Complete payroll management system with automated salary calculations, tax deductions, and comprehensive reporting dashboard using Spring Boot.",
       image: "💼",
-      tech: ["Spring Boot", "Thymeleaf", "MySQL", "Bootstrap"],
+      tech: ["Spring Boot", "Thymeleaf", "MySQL", "JUnit", "Jenkins"],
       github: "https://github.com/Avinashkr000/Spring_Employee_Payroll_Application",
       demo: "#",
       featured: false,
@@ -723,9 +840,9 @@ function EnhancedProjects() {
     },
     {
       title: "URL Shortener Service",
-      description: "High-performance URL shortening service with Redis caching, analytics dashboard, and custom domain support.",
+      description: "High-performance URL shortening service with Redis caching, analytics dashboard, custom domain support, and Docker containerization.",
       image: "🔗",
-      tech: ["Spring Boot", "Redis", "PostgreSQL", "React"],
+      tech: ["Spring Boot", "Redis", "PostgreSQL", "Docker", "AWS"],
       github: "https://github.com/Avinashkr000/UrlShortener",
       demo: "#", 
       featured: false,
@@ -743,7 +860,7 @@ function EnhancedProjects() {
           viewport={{ once: true }}
         >
           <h2 className="section-title-enhanced">Featured Projects</h2>
-          <div className="section-subtitle">Building solutions that make a difference</div>
+          <div className="section-subtitle">Production-ready applications with real-world impact</div>
         </motion.div>
 
         <div className="projects-grid-enhanced">
@@ -831,7 +948,7 @@ function EnhancedContact() {
       title: "Email",
       value: "ak749299.ak@gmail.com",
       link: "mailto:ak749299.ak@gmail.com",
-      description: "Drop me a line anytime"
+      description: "Professional inquiries welcome"
     },
     {
       icon: "💼", 
@@ -845,7 +962,14 @@ function EnhancedContact() {
       title: "GitHub", 
       value: "@Avinashkr000",
       link: "https://github.com/Avinashkr000",
-      description: "Check out my repositories"
+      description: "Explore my repositories"
+    },
+    {
+      icon: "📱",
+      title: "Phone",
+      value: "+91 9546057503",
+      link: "tel:+919546057503",
+      description: "Available for direct communication"
     }
   ];
 
@@ -859,7 +983,7 @@ function EnhancedContact() {
           viewport={{ once: true }}
         >
           <h2 className="section-title-enhanced">Let's Build Something Amazing</h2>
-          <div className="section-subtitle">Ready for your next project? Let's talk!</div>
+          <div className="section-subtitle">Open for opportunities and exciting collaborations</div>
         </motion.div>
 
         <div className="contact-content">
@@ -897,16 +1021,16 @@ function EnhancedContact() {
             transition={{ delay: 0.4 }}
           >
             <div className="cta-card">
-              <h3>Ready to Start Your Project?</h3>
-              <p>I'm currently available for new opportunities and exciting collaborations. Let's discuss how we can bring your ideas to life!</p>
+              <h3>Ready for Your Next Project?</h3>
+              <p>I'm currently available for full-time Java Backend roles, DevOps positions, and exciting project collaborations. Let's discuss how we can build scalable solutions together!</p>
               
               <div className="availability-status">
                 <span className="status-dot"></span>
-                <span>Available for work</span>
+                <span>Available for immediate joining</span>
               </div>
               
               <motion.a
-                href="mailto:ak749299.ak@gmail.com?subject=Project Collaboration"
+                href="mailto:ak749299.ak@gmail.com?subject=Job Opportunity - Java Backend Developer"
                 className="contact-primary-btn magnetic"
                 whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(99, 102, 241, 0.4)" }}
                 whileTap={{ scale: 0.95 }}
@@ -941,7 +1065,13 @@ function EnhancedFooter() {
               <span className="brand-name">AK</span>
               <span className="brand-bracket">/&gt;</span>
             </div>
-            <p>Building the future with clean code and innovative solutions.</p>
+            <p>Building scalable backend systems with modern DevOps practices.</p>
+            
+            <div className="certifications">
+              <span className="cert-badge">Java Expert</span>
+              <span className="cert-badge">AWS Cloud</span>
+              <span className="cert-badge">Spring Boot</span>
+            </div>
           </motion.div>
           
           <motion.div
@@ -956,12 +1086,14 @@ function EnhancedFooter() {
               <a href="https://github.com/Avinashkr000" target="_blank" rel="noreferrer">GitHub</a>
               <a href="https://www.linkedin.com/in/avinash-java-backend/" target="_blank" rel="noreferrer">LinkedIn</a>
               <a href="mailto:ak749299.ak@gmail.com">Email</a>
+              <a href="tel:+919546057503">Phone</a>
             </div>
             
             <div className="link-group">
               <h4>Projects</h4>
               <a href="#projects">Featured Work</a>
               <a href="https://github.com/Avinashkr000" target="_blank" rel="noreferrer">All Projects</a>
+              <a href="#skills">Technologies</a>
             </div>
           </motion.div>
         </div>
@@ -973,34 +1105,52 @@ function EnhancedFooter() {
           viewport={{ once: true }}
           transition={{ delay: 0.3 }}
         >
-          <p>© 2025 Avinash Kumar. Built with ❤️ using React, Framer Motion & Three.js</p>
-          <p className="footer-quote">"Code is poetry written for machines to understand" ☕</p>
+          <p>© 2025 Avinash Kumar • Built with ❤️ using React, Framer Motion & Three.js</p>
+          <p className="footer-quote">"Code is poetry that compiles into reality" ☕</p>
         </motion.div>
       </div>
     </footer>
   );
 }
 
-// Export the main App component
+/***********************
+ * Main App Component
+ ***********************/
 export default function App() {
   const { scrollYProgress } = useScroll();
+  const { theme, toggle } = useTheme();
+  const [showMainSite, setShowMainSite] = useState(false);
 
   useAdvancedMagnetic();
 
   return (
-    <div className="app">
+    <div className={`app theme-${theme}`} data-theme={theme}>
+      {!showMainSite && (
+        <SplashScreen onComplete={() => setShowMainSite(true)} />
+      )}
+
       <Enhanced3DBackground />
       <ParticleTrail />
       
       <motion.div className="scroll-progress" style={{ scaleX: scrollYProgress }} />
       
-      <ModernNavbar />
-      <EnhancedHero />
-      <EnhancedAbout />
-      <EnhancedSkills />
-      <EnhancedProjects />
-      <EnhancedContact />
-      <EnhancedFooter />
+      <AnimatePresence>
+        {showMainSite && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+          >
+            <ModernNavbar theme={theme} onThemeToggle={toggle} />
+            <EnhancedHero />
+            <EnhancedAbout />
+            <EnhancedSkills />
+            <EnhancedProjects />
+            <EnhancedContact />
+            <EnhancedFooter />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
