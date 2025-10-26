@@ -1,6 +1,7 @@
-/* Enhanced App.css with Next-Level Modern Design */
+/* Enhanced Portfolio CSS with Theme System & Multi-Language Splash */
 
 :root {
+  /* Core Theme Colors */
   --primary: #6366f1;
   --primary-dark: #4f46e5;
   --primary-light: #818cf8;
@@ -10,6 +11,7 @@
   --warning: #f59e0b;
   --error: #ef4444;
   
+  /* Default Dark Theme */
   --bg-primary: #0a0a0f;
   --bg-secondary: #1a1a2e;
   --bg-card: rgba(255, 255, 255, 0.05);
@@ -28,6 +30,22 @@
   --transition-bounce: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* Light Theme Variables */
+html[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-card: rgba(15, 23, 42, 0.04);
+  --bg-glass: rgba(15, 23, 42, 0.06);
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-dim: #64748b;
+  
+  --border-glass: rgba(15, 23, 42, 0.1);
+  --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.2);
+  --shadow-card: 0 8px 32px rgba(15, 23, 42, 0.1);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -40,11 +58,78 @@ body {
   color: var(--text-primary);
   overflow-x: hidden;
   line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .app {
   position: relative;
   min-height: 100vh;
+}
+
+/***********************
+ * Splash Screen Animations
+ ***********************/
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(26, 26, 46, 0.95) 0%, rgba(10, 10, 15, 1) 70%);
+  backdrop-filter: blur(10px);
+}
+
+html[data-theme="light"] .splash-overlay {
+  background: radial-gradient(ellipse at center, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 1) 70%);
+}
+
+.splash-content {
+  text-align: center;
+  position: relative;
+}
+
+.splash-greeting {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 40%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 2rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  text-shadow: 0 0 40px rgba(99, 102, 241, 0.3);
+}
+
+.splash-identity {
+  margin-bottom: 3rem;
+}
+
+.identity-name {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.identity-role {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.splash-progress {
+  position: absolute;
+  bottom: -4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 2px;
+  transform-origin: left;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
 }
 
 /* Enhanced 3D Background */
@@ -55,7 +140,8 @@ body {
   width: 100%;
   height: 100%;
   z-index: -2;
-  background: radial-gradient(ellipse at bottom, #1a1a2e 0%, #0a0a0f 100%);
+  background: radial-gradient(ellipse at bottom, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  transition: background 0.3s ease;
 }
 
 /* Particle Trail Effects */
@@ -76,7 +162,7 @@ body {
   filter: blur(0.5px);
 }
 
-/* Modern Glassmorphism Navbar */
+/* Enhanced Navbar with Theme Toggle */
 .modern-navbar {
   position: fixed;
   top: 0;
@@ -93,9 +179,19 @@ body {
   transition: var(--transition-smooth);
 }
 
+html[data-theme="light"] .modern-navbar {
+  background: rgba(248, 250, 252, 0.8);
+  border-bottom: 1px solid var(--border-glass);
+}
+
 .modern-navbar.scrolled {
   background: rgba(10, 10, 15, 0.9);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="light"] .modern-navbar.scrolled {
+  background: rgba(248, 250, 252, 0.95);
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
 }
 
 .nav-brand {
@@ -139,7 +235,7 @@ body {
   border-radius: 12px;
   transition: var(--transition-smooth);
   position: relative;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-card);
   border: 1px solid transparent;
 }
 
@@ -179,6 +275,13 @@ body {
   cursor: pointer;
   font-size: 1.2rem;
   transition: var(--transition-smooth);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.nav-theme-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-glow);
 }
 
 /* Enhanced Hero Section */
@@ -251,6 +354,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
+  flex-wrap: wrap;
 }
 
 .cursor {
@@ -263,7 +367,7 @@ body {
   color: var(--text-secondary);
   line-height: 1.8;
   margin-bottom: 3rem;
-  max-width: 600px;
+  max-width: 700px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -278,7 +382,7 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 2rem;
   margin-bottom: 3rem;
-  max-width: 500px;
+  max-width: 600px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -450,6 +554,7 @@ body {
   backdrop-filter: var(--blur-intensity);
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
 .story-card::before {
@@ -493,14 +598,14 @@ body {
 
 .stat-number {
   display: block;
-  font-size: 2rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: var(--primary);
   margin-bottom: 0.5rem;
 }
 
 .stat-text {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
@@ -521,11 +626,13 @@ body {
   overflow: hidden;
   transition: var(--transition-smooth);
   cursor: pointer;
+  box-shadow: var(--shadow-card);
 }
 
 .about-card-enhanced:hover {
   border-color: var(--primary);
   box-shadow: var(--shadow-glow);
+  transform: translateY(-5px);
 }
 
 .card-icon {
@@ -564,7 +671,7 @@ body {
 
 /* Skills Section */
 .skills-section {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-card);
 }
 
 .skills-categories {
@@ -578,6 +685,7 @@ body {
   border-radius: 24px;
   padding: 3rem;
   backdrop-filter: var(--blur-intensity);
+  box-shadow: var(--shadow-card);
 }
 
 .category-header {
@@ -604,7 +712,7 @@ body {
 }
 
 .skill-card-enhanced {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-card);
   border: 1px solid var(--border-glass);
   border-radius: 16px;
   padding: 2rem;
@@ -645,7 +753,7 @@ body {
 .progress-bg {
   flex: 1;
   height: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -697,7 +805,7 @@ body {
 
 /* Projects Section */
 .projects-section {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--bg-card);
 }
 
 .projects-grid-enhanced {
@@ -719,6 +827,7 @@ body {
   min-height: 400px;
   display: flex;
   flex-direction: column;
+  box-shadow: var(--shadow-card);
 }
 
 .project-card-3d-enhanced.featured {
@@ -849,7 +958,7 @@ body {
 
 /* Contact Section */
 .contact-section {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-card);
 }
 
 .contact-content {
@@ -879,6 +988,7 @@ body {
   transition: var(--transition-smooth);
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
 .contact-method:hover {
@@ -935,6 +1045,7 @@ body {
   backdrop-filter: var(--blur-intensity);
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
 .cta-card h3 {
@@ -996,7 +1107,7 @@ body {
 
 /* Footer */
 .footer-enhanced {
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--bg-glass);
   border-top: 1px solid var(--border-glass);
   padding: 4rem 0 2rem;
   backdrop-filter: var(--blur-intensity);
@@ -1013,11 +1124,29 @@ body {
   font-size: 2rem;
   font-weight: 800;
   margin-bottom: 1rem;
+  color: var(--text-primary);
 }
 
 .footer-brand p {
   color: var(--text-secondary);
   line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.certifications {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.cert-badge {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
 .footer-links {
@@ -1098,7 +1227,7 @@ body {
   }
   
   .nav-links-modern {
-    gap: 1rem;
+    gap: 0.5rem;
   }
   
   .nav-link-modern {
@@ -1158,11 +1287,32 @@ body {
     width: 100%;
     max-width: 280px;
   }
+  
+  .hero-subtitle-enhanced {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .splash-greeting {
+    font-size: clamp(2rem, 10vw, 4rem);
+  }
+  
+  .identity-name {
+    font-size: clamp(1.2rem, 6vw, 2rem);
+  }
+  
+  .identity-role {
+    font-size: clamp(0.9rem, 4vw, 1.2rem);
+  }
+  
+  .splash-progress {
+    width: 150px;
+  }
 }
 
 @media (max-width: 480px) {
   .nav-links-modern {
-    gap: 0.5rem;
+    gap: 0.25rem;
   }
   
   .nav-link-modern {
@@ -1176,6 +1326,10 @@ body {
   
   .stat-item {
     padding: 1rem 0.5rem;
+  }
+  
+  .certifications {
+    justify-content: center;
   }
 }
 
@@ -1202,4 +1356,9 @@ body {
 
 .glow-animation {
   animation: glow 2s ease-in-out infinite;
+}
+
+/* Smooth Theme Transitions */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
