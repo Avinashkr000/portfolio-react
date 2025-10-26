@@ -44,7 +44,7 @@ function ThemeToggle({ onClick, theme }) {
  ***********************/
 const welcomeMessages = [
   "Welcome", "Namaste", "नमस्ते", "Bonjour", "Hola", "Hallo", "Ciao", "Olá", "Привет", 
-  "مرحبا", "שלום", "नमस्कार", "ਸਤ ਸ੍ਰੀ ਅਕਾਲ", "வணக்கம்", "നമസ്തേ", "నమస్తే", "ನಮಸ್ಕಾರ", 
+  "مرحبا", "שלום", "नमस्कार", "ਸਤ ਸ੍ਰੀ ਅਕਾਲ", "வணக்கம்", "നमस्तേ", "నमस्तే", "ನಮಸ್ಕಾರ", 
   "ජය වේවා", "สวัสดี", "Xin chào", "こんにちは", "안녕하세요", "你好", "Selamat datang", 
   "Kia ora", "Salaam", "Merhaba", "Hej", "Hei", "Ahoj", "Sveiki", "Tere", "Moien", 
   "Bună", "Sawasdee", "Habari", "Halo", "Guten Tag", "Shalom", "Asalaam Alaikum", 
@@ -503,9 +503,9 @@ function EnhancedHero() {
           transition={{ duration: 0.8, delay: 0.9 }}
         >
           {[
-            { label: "Projects", value: "15+" },
+            { label: "Projects", value: "7+" },
             { label: "DSA Solved", value: "220+" },
-            { label: "Experience", value: "2+ Years" },
+            { label: "Experience", value: "2 months" },
             { label: "Technologies", value: "15+" }
           ].map((stat, index) => (
             <motion.div
